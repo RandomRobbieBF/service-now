@@ -52,9 +52,17 @@ def test_url(url,i):
 						if not os.path.exists(""+url+""):
 							os.mkdir(""+url+"")
 						print("[+] Found article for KB00"+str(i)+" [+]")
+						# Create a list of url that we can access
 						text_file = open(""+url+"/found-"+url+".txt", "a")
 						text_file.write(""+url+"/"+newurl+"\n")
 						text_file.close()
+						
+						# Create a text file of the HTML for grepping later
+						text_file = open(""+url+"/KB00"+str(i)+".txt", "a")
+						text_file.write(response.text)
+						text_file.close()
+						
+						# Screenshots to maybe help review whats there and evidence.
 						driver = webdriver.Remote('http://127.0.0.1:4444', DesiredCapabilities.CHROME)  
 						driver.get(newurl)
 						driver.set_window_size(1290, 1080)
