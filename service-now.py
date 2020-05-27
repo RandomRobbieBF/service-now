@@ -11,9 +11,14 @@
 import requests
 import sys
 import argparse
+import time
+import os
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 session = requests.Session()
+
 
 
 parser = argparse.ArgumentParser()
@@ -39,24 +44,43 @@ def test_url(url,i):
 	headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:75.0) Gecko/20100101 Firefox/75.0","Connection":"close","Accept":"*/*","Content-Type":"application/x-www-form-urlencoded"}
 	try:
 		newurl = "https://"+url+"/kb_view_customer.do?sysparm_article=KB00"+str(i)+""
-		response = session.post(newurl, headers=headers,verify=False, proxies=proxyDict,timeout=30)
+		response = session.get(newurl, headers=headers,verify=False, proxies=proxyDict,timeout=30)
 		if response.status_code == 200:
 			if "1 out of 5 Star Rating" in response.text:
 				if "INSUFFICIENT ROLES TO VIEW PROTECTED ARTICLE" not in response.text:
 					if "ARTICLE NOT FOUND" not in response.text:
+						if not os.path.exists(""+url+""):
+							os.mkdir(""+url+"")
 						print("[+] Found article for KB00"+str(i)+" [+]")
-						text_file = open("found-"+url+".txt", "a")
-						text_file.write(""+newurl+"\n")
+						text_file = open(""+url+"/found-"+url+".txt", "a")
+						text_file.write(""+url+"/"+newurl+"\n")
 						text_file.close()
+						driver = webdriver.Remote('http://127.0.0.1:4444', DesiredCapabilities.CHROME)  
+						driver.get(newurl)
+						driver.set_window_size(1290, 1080)
+						driver.save_screenshot(""+url+"/KB00"+str(i)+".png")
+						driver.close()
 					else:
 						print("[-] No Luck for KB00"+str(i)+" [-]")
 			else:
 				print("[-] No Luck for KB00"+str(i)+" [-]")
 		else:
 			print("[-] No Luck for KB00"+str(i)+" [-]")
-	except:
+	except Exception as e:
+		print('Error: %s' % e)
 		print ("[-]Check Url might have Issues[-]")
 		sys.exit(0)
-		
-for i in range(27000,30000):
-	  test_url(url,i)
+try:
+	os.system("docker run --name screenshotter -d --rm -p:4444:4444 retreatguru/headless-chromedriver")		
+	for i in range(10040,30000):
+		test_url(url,i)
+	os.system("docker stop screenshotter")
+except KeyboardInterrupt:
+		print ("Ctrl-c pressed ...")
+		os.system("docker stop screenshotter")
+		sys.exit(1)
+				
+except Exception as e:
+		print('Error: %s' % e)
+		os.system("docker stop screenshotter")
+		sys.exit(1)
