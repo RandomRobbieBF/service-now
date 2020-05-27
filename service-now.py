@@ -41,7 +41,7 @@ proxyDict = {
   
   
 def test_url(url,i):
-	headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:75.0) Gecko/20100101 Firefox/75.0","Connection":"close","Accept":"*/*","Content-Type":"application/x-www-form-urlencoded"}
+	headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:75.0) Gecko/20100101 Firefox/75.0","Connection":"close","Accept":"*/*"}
 	try:
 		newurl = "https://"+url+"/kb_view_customer.do?sysparm_article=KB00"+str(i)+""
 		response = session.get(newurl, headers=headers,verify=False, proxies=proxyDict,timeout=30)
@@ -54,7 +54,7 @@ def test_url(url,i):
 						print("[+] Found article for KB00"+str(i)+" [+]")
 						# Create a list of url that we can access
 						text_file = open(""+url+"/found-"+url+".txt", "a")
-						text_file.write(""+url+"/"+newurl+"\n")
+						text_file.write(""+newurl+"\n")
 						text_file.close()
 						
 						# Create a text file of the HTML for grepping later
@@ -63,7 +63,7 @@ def test_url(url,i):
 						text_file.close()
 						
 						# Screenshots to maybe help review whats there and evidence.
-						driver = webdriver.Remote('http://127.0.0.1:4444', DesiredCapabilities.CHROME)  
+						driver = webdriver.Remote('http://127.0.0.1:4444',DesiredCapabilities.CHROME)  
 						driver.get(newurl)
 						driver.set_window_size(1290, 1080)
 						driver.save_screenshot(""+url+"/KB00"+str(i)+".png")
@@ -79,7 +79,7 @@ def test_url(url,i):
 		print ("[-]Check Url might have Issues[-]")
 		sys.exit(0)
 try:
-	os.system("docker run --name screenshotter -d --rm -p:4444:4444 retreatguru/headless-chromedriver")		
+	os.system("docker run --name screenshotter -d --rm -p:4444:4444 txt3rob/headless-chromedriver")		
 	for i in range(10040,30000):
 		test_url(url,i)
 	os.system("docker stop screenshotter")
