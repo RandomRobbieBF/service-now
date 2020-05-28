@@ -10,3 +10,8 @@ How to Use
 ```
 python3 service-now.py -u somecompanyservice-now.com
 ```
+
+```
+usage: service-now.py [-h] -u URL [-p PROXY]
+service-now.py: error: the following arguments are required: -u/--ur
+```
