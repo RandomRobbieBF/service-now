@@ -23,16 +23,19 @@ session = requests.Session()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--url", required=True ,default="my.service-now.com",help="URL to test - no need for https://")
-parser.add_argument("-p", "--proxy", default="http://127.0.0.1:8085",required=False, help="Proxy for debugging")
+parser.add_argument("-p", "--proxy",required=False, help="Proxy for debugging")
 
 args = parser.parse_args()
 url = args.url
 proxy = args.proxy
 
+if proxy:
+	http_proxy = proxy
+else:
+	http_proxy = ""
 
 
 
-http_proxy = proxy
 proxyDict = { 
               "http"  : http_proxy, 
               "https" : http_proxy, 
